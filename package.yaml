@@ -1,0 +1,55 @@
+name:                Administrador-Granja
+version:             0.1.0.0
+github:              "githubuser/Administrador-Granja"
+license:             BSD3
+author:              "Alejandro Rivosecchi"
+maintainer:          "example@example.com"
+copyright:           "2020 Alejandro Rivosecchi"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/githubuser/Administrador-Granja#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- HDBC
+- HDBC-sqlite3
+- gi-gtk
+- gi-gdk
+- haskell-gi-base
+- convertible
+- text
+
+library:
+  source-dirs: src
+
+executables:
+  Administrador-Granja-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - Administrador-Granja
+
+tests:
+  Administrador-Granja-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - Administrador-Granja

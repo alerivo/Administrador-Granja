@@ -1,0 +1,88 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 8b776c3603e72cdf4802c744160533bec2f4db26c2e583ac0a70388e0f9f0808
+
+name:           Administrador-Granja
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/Administrador-Granja#readme>
+homepage:       https://github.com/githubuser/Administrador-Granja#readme
+bug-reports:    https://github.com/githubuser/Administrador-Granja/issues
+author:         Alejandro Rivosecchi
+maintainer:     example@example.com
+copyright:      2020 Alejandro Rivosecchi
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/githubuser/Administrador-Granja
+
+library
+  exposed-modules:
+      Biblioteca
+      Estructuras
+      GUI.GUI
+      GUI.Misc
+      GUI.Productos
+      Inicializador
+  other-modules:
+      Paths_Administrador_Granja
+  hs-source-dirs:
+      src
+  build-depends:
+      HDBC
+    , HDBC-sqlite3
+    , base >=4.7 && <5
+    , convertible
+    , gi-gdk
+    , gi-gtk
+    , haskell-gi-base
+    , text
+  default-language: Haskell2010
+
+executable Administrador-Granja-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_Administrador_Granja
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      Administrador-Granja
+    , HDBC
+    , HDBC-sqlite3
+    , base >=4.7 && <5
+    , convertible
+    , gi-gdk
+    , gi-gtk
+    , haskell-gi-base
+    , text
+  default-language: Haskell2010
+
+test-suite Administrador-Granja-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_Administrador_Granja
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      Administrador-Granja
+    , HDBC
+    , HDBC-sqlite3
+    , base >=4.7 && <5
+    , convertible
+    , gi-gdk
+    , gi-gtk
+    , haskell-gi-base
+    , text
+  default-language: Haskell2010
