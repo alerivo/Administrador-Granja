@@ -13,6 +13,6 @@ cabal install gi-gtk
 Comando para compilar y ejecutar:
 `stack build && stack exec Administrador-Granja-exe`
 
-# To Do:
+## To Do:
 * Evitar la edicion de un producto que esta por venderse.
 * Asignar teclas para cada Stack (por ejemplo F1, F2 y F3)
