@@ -16,3 +16,5 @@ Comando para compilar y ejecutar:
 ## To Do:
 * Evitar la edicion de un producto que esta por venderse.
 * Asignar teclas para cada Stack (por ejemplo F1, F2 y F3)
+* Mejorar el historial de ventas: que quede registrado que productos se vendieron.
+* Mejorar visualización de las ventas: por ejemplo poder ver las ventas por día/mes/año.
