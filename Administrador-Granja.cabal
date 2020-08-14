@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8b776c3603e72cdf4802c744160533bec2f4db26c2e583ac0a70388e0f9f0808
+-- hash: 5e8b9760114e5c083b3b6d374c966e583d33e0e6083c5b722eb1fcd5460ad57e
 
 name:           Administrador-Granja
 version:        0.1.0.0
@@ -32,6 +32,8 @@ library
       GUI.GUI
       GUI.Misc
       GUI.Productos
+      GUI.Vender
+      GUI.Ventas
       Inicializador
   other-modules:
       Paths_Administrador_Granja

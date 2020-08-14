@@ -10,16 +10,8 @@ iniciar conn = do run conn "CREATE TABLE IF NOT EXISTS productos(\
                     \proveedor TEXT,\
                     \precio REAL NOT NULL,\
                     \stock INTEGER)" []
-                  run conn "CREATE TABLE IF NOT EXISTS vendidos(\
-                    \producto_codigo INTEGER,\
-                    \venta_id INTEGER,\
-                    \FOREIGN KEY (producto_codigo) REFERENCES productos(codigo)\
-                    \ON DELETE RESTRICT \
-                    \ON UPDATE RESTRICT \
-                    \FOREIGN KEY (venta_id) REFERENCES ventas(id)\
-                    \ON DELETE CASCADE \
-                    \ON UPDATE RESTRICT)" []
                   run conn "CREATE TABLE IF NOT EXISTS ventas(\
-                    \id INTEGER PRIMARY KEY AUTOINCREMENT,\
-                    \timestamp TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)" []
+                    \id INTEGER PRIMARY KEY,\
+                    \timestamp TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,\
+                    \total REAL NOT NULL)" []
                   commit conn

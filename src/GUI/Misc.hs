@@ -7,19 +7,29 @@ module GUI.Misc where
 import qualified GI.Gtk as Gtk
 import Data.GI.Base
 import Data.Text (Text)
+import Control.Monad (when)
 
-mostrarError :: Text -> IO ()
-mostrarError msg = do
+mostrarError :: Maybe Gtk.Window -> Text -> Text -> IO ()
+mostrarError window titulo msg = do
   dialog <- new Gtk.MessageDialog [ Gtk.dialogUseHeaderBar := 0,
                          Gtk.messageDialogMessageType := Gtk.MessageTypeError,
                          Gtk.messageDialogButtons := Gtk.ButtonsTypeOk,
-                         #text := "Error al agregar el producto",
+                         #text := titulo,
                          #secondaryText := msg]
+  when (window==Nothing) (putStrLn "nothing")
+  Gtk.windowSetTransientFor dialog window
   Gtk.dialogRun dialog
   Gtk.widgetDestroy dialog
   return ()
 
--- Aplica una operacion monadica y desecha lo que retorna.
--- Esta función es util para usar la función when
-aplicar :: IO a -> IO ()
-aplicar a = a >>= \_ -> return ()
+mostrarErrorSimple :: Maybe Gtk.Window -> Text -> IO ()
+mostrarErrorSimple window msg = do
+  dialog <- new Gtk.MessageDialog [ Gtk.dialogUseHeaderBar := 0,
+                         Gtk.messageDialogMessageType := Gtk.MessageTypeError,
+                         Gtk.messageDialogButtons := Gtk.ButtonsTypeOk,
+                         #text := msg ]
+  when (window==Nothing) $ putStrLn "nothing"
+  Gtk.windowSetTransientFor dialog window
+  Gtk.dialogRun dialog
+  Gtk.widgetDestroy dialog
+  return ()

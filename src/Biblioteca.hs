@@ -3,6 +3,7 @@ module Biblioteca where
 import Estructuras
 import Database.HDBC
 import Database.HDBC.Sqlite3 (Connection, connectSqlite3)
+import Data.Convertible.Base (ConvertError)
 import Data.Maybe (fromJust, isJust)
 import Data.Text (Text)
 import Data.Int (Int32)
@@ -17,20 +18,20 @@ desconectarDB conn = disconnect conn
 agregarProducto :: Producto -> Connection -> IO Bool
 agregarProducto prod conn =
   let codigo_ = codigo prod
-      Just nombre_ = nombre prod
+      nombre_ = nombre prod
       proveedor_ = proveedor prod
-      Just precio_ = precio prod
+      precio_ = precio prod
       stock_ = stock prod
-      
+
       codigo_sql = toSql codigo_
       nombre_sql = toSql nombre_
       proveedor_sql = if isJust proveedor_ then toSql (fromJust proveedor_) else SqlNull
       precio_sql = toSql precio_
       stock_sql = if isJust stock_ then toSql (fromJust stock_) else SqlNull
-      
+
       querySelect = "SELECT COUNT(*) FROM productos WHERE codigo = ?"
       argsSelect = [codigo_sql]
-      
+
       queryInsert = "INSERT INTO productos VALUES (?,?,?,?,?)"
       argsInsert = [codigo_sql,nombre_sql,proveedor_sql,precio_sql,stock_sql]
   in
@@ -41,13 +42,40 @@ agregarProducto prod conn =
                 return $ toEnum (fromInteger filasModificadas)
         else return False
 
+buscarProducto :: Int32 -> Connection -> IO (Maybe Producto)
+buscarProducto codigo_ conn = do
+  let codigo_sql = toSql $ codigo_
+
+      query = "SELECT codigo, nombre, proveedor, precio, stock FROM productos WHERE codigo = ?"
+
+      arg = [codigo_sql]
+
+  resultado <- quickQuery' conn query arg
+  if resultado == []
+  then return Nothing
+  else do
+    let [[codigo_sql, nombre_sql, proveedor_sql, precio_sql, stock_sql]] = resultado
+        codigo_ = (fromSql codigo_sql) :: Int32
+        nombre_ = (fromSql nombre_sql) :: Text
+        proveedor_ = (safeFromSql proveedor_sql) :: Either ConvertError Text
+        precio_ = (fromSql precio_sql) :: Double
+        stock_ = (safeFromSql stock_sql) :: Either ConvertError Int32
+
+        prod = Producto {codigo = codigo_,
+                         nombre = nombre_,
+                         proveedor = either (\_ -> Nothing) Just proveedor_,
+                         precio = precio_,
+                         stock = either (\_ -> Nothing) Just stock_}
+
+    return $ Just prod
+
 -- ~ El valor booleano representa si el producto fue eliminado o no
 eliminarProducto :: Producto -> Connection -> IO Bool
 eliminarProducto prod conn =
   let codigo_sql = toSql $ codigo prod
-      
+
       querySelect = "SELECT COUNT(*) FROM productos WHERE codigo = ?"
-      
+
       queryDelete = "DELETE FROM productos WHERE codigo = ?"
 
       arg = [codigo_sql]
@@ -162,3 +190,28 @@ actualizarPrecio conn prod precio =
       commit conn
       return $ toEnum (fromInteger filasModificadas)
     else return False
+
+-- ~ Agrega una venta con el total dado y devuelve el ID y el TIMESTAMP de dicha venta
+agregarVenta :: Connection -> Double -> IO (Int32, Text)
+agregarVenta conn total = do
+  let total_sql = toSql total
+      queryInsert = "INSERT INTO ventas (total) VALUES (?)"
+      argInsert = [total_sql]
+
+      querySelect = "SELECT id, timestamp from ventas WHERE id = last_insert_rowid()"
+      argSelect = []
+  run conn queryInsert argInsert
+  commit conn
+  [[id_sql, timestamp_sql]] <- quickQuery' conn querySelect argSelect
+  let id_ = (fromSql id_sql) :: Int32
+      timestamp_ = (fromSql timestamp_sql) :: Text
+  return (id_, timestamp_)
+
+-- ~ Asume que existe una entrada con el id pasado
+eliminarVenta :: Connection -> Int32 -> IO ()
+eliminarVenta conn id = do
+  let id_sql = toSql id
+      query = "DELETE FROM ventas WHERE id = ?"
+      arg = [id_sql]
+  run conn query arg
+  commit conn

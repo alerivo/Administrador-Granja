@@ -17,7 +17,7 @@ import Data.Maybe (fromJust, isNothing, isJust, maybe)
 import Data.Int (Int32)
 import Data.Text (Text, pack, unpack, isInfixOf)
 import Text.Read (readMaybe)
-import Control.Monad (when)
+import Control.Monad (when, void)
 
 rellenarProductos :: Gtk.ListStore -> Connection -> IO ()
 rellenarProductos store conn =
@@ -27,11 +27,11 @@ rellenarProductos store conn =
     productos <- quickQuery' conn query []
     rellenar productos
     where
-    rellenar productos_ =
-      if productos_ == []
+    rellenar productos =
+      if productos == []
       then return ()
       else let
-        [codigo_sql, nombre_sql, proveedor_sql, precio_sql, stock_sql] = head productos_
+        [codigo_sql, nombre_sql, proveedor_sql, precio_sql, stock_sql] = head productos
         codigo_ = (fromSql codigo_sql) :: Int32
         nombre_ = (Just (fromSql nombre_sql)) :: Maybe Text
         proveedor_ = (safeFromSql proveedor_sql) :: Either ConvertError Text
@@ -48,7 +48,7 @@ rellenarProductos store conn =
           Gtk.listStoreInsertWithValuesv store (-1) [0,1,2,3,4,5]
             [codigo_gvalue,nombre_gvalue,proveedor_gvalue,precio_gvalue,stock_gvalue,visible_gvalue]
 
-          rellenar $ tail productos_
+          rellenar $ tail productos
 
 mostrarStock :: Gtk.TreeViewColumn -> Gtk.CellRenderer -> Gtk.TreeModel -> Gtk.TreeIter -> IO ()
 mostrarStock treeViewColumn cellRenderer treeModel treeIter = do
@@ -102,7 +102,7 @@ productoEditado model conn "stock" path_s stock = do
     codigo_ <- #getValue model iter 0 >>= fromGValue :: IO Int32
     let prod = Producto {codigo = fromIntegral codigo_}
         stock_nuevo = (readMaybe (unpack stock)) :: Maybe Int32
-    if isNothing stock_nuevo || (isJust stock_nuevo && (fromJust stock_nuevo) < 0)
+    if maybe True (<0) stock_nuevo
     then do
       success <- actualizarStock conn prod (-1)
       when success $ toGValue ((-1)::Int32) >>= #setValue model iter 4
@@ -154,7 +154,7 @@ eliminarProductoCallBack conn productos_view productos_store = do
     success <- eliminarProducto prod conn
     path <- Gtk.treeModelGetPath model iter
     (success2, iter2) <- Gtk.treeModelGetIter productos_store path
-    when (success && success2) $ aplicar (Gtk.listStoreRemove productos_store iter2)
+    when (success && success2) $ void (Gtk.listStoreRemove productos_store iter2)
   else return ()
 
 setUpVentanaAgregarProducto :: Gtk.Builder -> Connection -> Gtk.ListStore -> Gtk.Window -> IO ()
@@ -189,20 +189,22 @@ agregarAux builder conn store ventana = do
       stock_m = readMaybe (unpack stock_s) :: Maybe Int32
 
       error1 = if nombre_s == "" then True else False
-      error2 = if isNothing codigo_m then True else False
-      error3 = if isNothing precio_m || (fromJust precio_m) < 0 then True else False
+      error2 = maybe True (\_ -> False) codigo_m
+      error3 = maybe True (<0) precio_m
 
   if error1 || error2 || error3
-  then mostrarError "El producto debe contener un nombre, un código numerico y un precio mayor o igual a 0."
+  then do
+    window <- Gtk.widgetGetToplevel nombre_e >>= castTo Gtk.Window
+    mostrarError window "Error al agregar el producto" "El producto debe contener un nombre, un código numerico y un precio mayor o igual a 0."
   else do
     let codigo_ = fromJust codigo_m
-        nombre_ = Just nombre_s
+        nombre_ = nombre_s
         proveedor_ = if proveedor_s == "" then Nothing else Just proveedor_s
 
         prod = Producto {codigo = codigo_,
                          nombre = nombre_,
                          proveedor = proveedor_,
-                         precio = precio_m,
+                         precio = fromJust precio_m,
                          stock = stock_m}
 
     success <- agregarProducto prod conn
@@ -210,7 +212,7 @@ agregarAux builder conn store ventana = do
     if success
     then do
       codigo_gvalue <- toGValue codigo_
-      nombre_gvalue <- toGValue nombre_
+      nombre_gvalue <- toGValue (Just nombre_)
       proveedor_gvalue <- toGValue (maybe (Just "") Just proveedor_)
       precio_gvalue <- toGValue $ fromJust precio_m
       stock_gvalue <- toGValue (maybe (-1) id stock_m)
@@ -227,4 +229,29 @@ agregarAux builder conn store ventana = do
       Gtk.entrySetText stock_e ""
 
       return ()
-    else mostrarError "Probablemente ya existe un producto con el mismo código."
+    else do
+      window <- Gtk.widgetGetToplevel nombre_e >>= castTo Gtk.Window
+      mostrarError window "Error al agregar el producto" "Probablemente ya existe un producto con el mismo código."
+
+-- ~ Busca un código en la store de productos, devuelve iter a el
+-- ~ si lo encuentra y Nothing sino.
+buscarStore :: Gtk.ListStore -> Int32 -> IO (Maybe Gtk.TreeIter)
+buscarStore store codigo_a_buscar = do
+  (set, iter) <- Gtk.treeModelGetIterFirst store
+  if set
+  then do
+    codigo_actual <- #getValue store iter 0 >>= fromGValue :: IO Int32
+    if codigo_a_buscar == codigo_actual
+    then return $ Just iter
+    else buscarStoreAux store codigo_a_buscar iter
+  else return Nothing
+  where
+  buscarStoreAux store codigo_a_buscar iter = do
+    set <- Gtk.treeModelIterNext store iter
+    if set
+    then do
+      codigo_actual <- Gtk.treeModelGetValue store iter 0 >>= fromGValue :: IO Int32
+      if codigo_a_buscar == codigo_actual
+      then return $ Just iter
+      else buscarStoreAux store codigo_a_buscar iter
+    else return Nothing
