@@ -1,5 +1,5 @@
 # Administrador-Granja
-Administrador de granja donde cargar productos y realizar ventas.
+Administrador de granja donde cargar productos, realizar ventas y visualizarlas.
 
 Comandos para instalar dependencias:
 ```sudo apt-get install sqlite3
