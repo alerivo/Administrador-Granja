@@ -1,6 +1,8 @@
 # Administrador-Granja
 Administrador de granja donde cargar productos, realizar ventas y visualizarlas.
 
+Utiliza [stack](https://docs.haskellstack.org/en/stable/install_and_upgrade/) para manejador del proyecto.
+
 Comandos para instalar dependencias:
 ```sudo apt-get install sqlite3
 sudo apt-get install libsqlite3-dev
@@ -25,9 +27,7 @@ Y la siguiente imagen muestra el pasaje a tablas:
 ![tablas](/assets/tablas.png)
 
 ## To Do:
-* Evitar la edicion de un producto que esta por venderse.
-* Asignar teclas para cada Stack (por ejemplo F1, F2 y F3)
+* Evitar la edición de un producto que esta por venderse.
+* Asignar teclas para seleccionar cada Stack (por ejemplo F1, F2 y F3)
 * Mejorar el historial de ventas: que quede registrado que productos se vendieron.
 * Mejorar visualización de las ventas: por ejemplo poder ver las ventas por día/mes/año.
-
-
