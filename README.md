@@ -15,6 +15,11 @@ stack install gi-gtk
 Comando para compilar y ejecutar:
 `stack build && stack exec Administrador-Granja-exe`
 
+En los siguientes enlaces hay documentación sobre los paquetes mas usados:
+*![HDBC](https://hackage.haskell.org/package/HDBC-2.4.0.3/docs/Database-HDBC.html)
+*![GTK+ 3](https://developer.gnome.org/gtk3/stable/)
+*![gi-gtk](https://hackage.haskell.org/package/gi-gtk-3.0.33)
+
 ## Base de datos
 El programa utiliza una base de datos para llevar registro de todos los productos y las ventas realizadas.
 
