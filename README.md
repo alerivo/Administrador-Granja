@@ -1,7 +1,7 @@
 # Administrador-Granja
 Administrador de granja donde cargar productos, realizar ventas y visualizarlas.
 
-Utiliza [stack](https://docs.haskellstack.org/en/stable/install_and_upgrade/) para manejar del proyecto.
+Utiliza [stack](https://docs.haskellstack.org/en/stable/install_and_upgrade/) para manejar el proyecto.
 
 Comandos para instalar dependencias:
 ```sudo apt-get install sqlite3
