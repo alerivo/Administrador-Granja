@@ -17,10 +17,12 @@ Comando para compilar y ejecutar:
 El programa utiliza una base de datos para llevar registro de todos los productos y las ventas realizadas.
 
 La siguiente imagen muestra el diagrama entidad-relación utilizado por la misma:
-![](/assets/diagrama_entidad_relacion.png)
+
+![diagrama e/r](/assets/diagrama_entidad_relacion.png)
 
 Y la siguiente imagen muestra el pasaje a tablas:
-![](/assets/tablas.png)
+
+![tablas](/assets/tablas.png)
 
 ## To Do:
 * Evitar la edicion de un producto que esta por venderse.
