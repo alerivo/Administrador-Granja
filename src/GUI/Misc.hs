@@ -9,6 +9,7 @@ import Data.GI.Base
 import Data.Text (Text)
 import Control.Monad (when)
 
+-- ~ window es la ventana principal a la que se asocia el mensaje de error.
 mostrarError :: Maybe Gtk.Window -> Text -> Text -> IO ()
 mostrarError window titulo msg = do
   dialog <- new Gtk.MessageDialog [ Gtk.dialogUseHeaderBar := 0,
@@ -22,6 +23,7 @@ mostrarError window titulo msg = do
   Gtk.widgetDestroy dialog
   return ()
 
+-- ~ window es la ventana principal a la que se asocia el mensaje de error.
 mostrarErrorSimple :: Maybe Gtk.Window -> Text -> IO ()
 mostrarErrorSimple window msg = do
   dialog <- new Gtk.MessageDialog [ Gtk.dialogUseHeaderBar := 0,

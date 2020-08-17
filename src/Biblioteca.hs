@@ -1,7 +1,7 @@
 module Biblioteca where
 
 import Estructuras
-import Database.HDBC
+import Database.HDBC (run, commit, safeFromSql, fromSql, toSql, quickQuery', SqlValue ( SqlNull ), disconnect)
 import Database.HDBC.Sqlite3 (Connection, connectSqlite3)
 import Data.Convertible.Base (ConvertError)
 import Data.Maybe (fromJust, isJust)
@@ -14,9 +14,9 @@ conectarDB = connectSqlite3 "Base de datos/granja.db"
 desconectarDB :: Connection -> IO ()
 desconectarDB conn = disconnect conn
 
--- ~ El valor booleano representa si el producto fue agregado o no
+-- ~ El valor booleano representa si el producto fue agregado o no.
 agregarProducto :: Producto -> Connection -> IO Bool
-agregarProducto prod conn =
+agregarProducto prod conn = do
   let codigo_ = codigo prod
       nombre_ = nombre prod
       proveedor_ = proveedor prod
@@ -34,13 +34,12 @@ agregarProducto prod conn =
 
       queryInsert = "INSERT INTO productos VALUES (?,?,?,?,?)"
       argsInsert = [codigo_sql,nombre_sql,proveedor_sql,precio_sql,stock_sql]
-  in
-  do  [[resultado]] <- quickQuery' conn querySelect argsSelect
-      if ((fromSql resultado) :: Int) == 0
-        then do filasModificadas <- run conn queryInsert argsInsert
-                commit conn
-                return $ toEnum (fromInteger filasModificadas)
-        else return False
+  [[resultado]] <- quickQuery' conn querySelect argsSelect
+  if ((fromSql resultado) :: Int) == 0
+    then do filasModificadas <- run conn queryInsert argsInsert
+            commit conn
+            return $ toEnum (fromInteger filasModificadas)
+    else return False
 
 buscarProducto :: Int32 -> Connection -> IO (Maybe Producto)
 buscarProducto codigo_ conn = do
@@ -69,7 +68,7 @@ buscarProducto codigo_ conn = do
 
     return $ Just prod
 
--- ~ El valor booleano representa si el producto fue eliminado o no
+-- ~ El valor booleano representa si el producto fue eliminado o no.
 eliminarProducto :: Producto -> Connection -> IO Bool
 eliminarProducto prod conn =
   let codigo_sql = toSql $ codigo prod
@@ -87,7 +86,7 @@ eliminarProducto prod conn =
                 return $ toEnum (fromInteger filasModificadas)
         else return False
 
--- ~ El valor booleano representa si el nombre fue actualizado o no
+-- ~ El valor booleano representa si el nombre fue actualizado o no.
 actualizarNombre :: Connection -> Producto -> Text -> IO Bool
 actualizarNombre conn prod nombre = 
   let codigo_sql = toSql $ codigo prod
@@ -107,7 +106,7 @@ actualizarNombre conn prod nombre =
       return $ toEnum (fromInteger filasModificadas)
     else return False
 
--- ~ El valor booleano representa si el proveedor fue actualizado o no
+-- ~ El valor booleano representa si el proveedor fue actualizado o no.
 actualizarProveedor :: Connection -> Producto -> Text -> IO Bool
 actualizarProveedor conn prod proveedor = 
   let codigo_sql = toSql $ codigo prod
@@ -127,7 +126,7 @@ actualizarProveedor conn prod proveedor =
       return $ toEnum (fromInteger filasModificadas)
     else return False
 
--- ~ El valor booleano representa si el codigo fue actualizado o no
+-- ~ El valor booleano representa si el código fue actualizado o no.
 actualizarCodigo :: Connection -> Producto -> Int32 -> IO Bool
 actualizarCodigo conn prod codigo_nuevo = 
   let codigo_sql = toSql $ codigo prod
@@ -151,7 +150,7 @@ actualizarCodigo conn prod codigo_nuevo =
       return $ toEnum (fromInteger filasModificadas)
     else return False
 
--- ~ El valor booleano representa si el stock fue actualizado o no
+-- ~ El valor booleano representa si el stock fue actualizado o no.
 actualizarStock :: Connection -> Producto -> Int32 -> IO Bool
 actualizarStock conn prod stock = 
   let codigo_sql = toSql $ codigo prod
@@ -171,7 +170,7 @@ actualizarStock conn prod stock =
       return $ toEnum (fromInteger filasModificadas)
     else return False
 
--- ~ El valor booleano representa si el precio fue actualizado o no
+-- ~ El valor booleano representa si el precio fue actualizado o no.
 actualizarPrecio :: Connection -> Producto -> Double -> IO Bool
 actualizarPrecio conn prod precio = 
   let codigo_sql = toSql $ codigo prod
@@ -191,7 +190,7 @@ actualizarPrecio conn prod precio =
       return $ toEnum (fromInteger filasModificadas)
     else return False
 
--- ~ Agrega una venta con el total dado y devuelve el ID y el TIMESTAMP de dicha venta
+-- ~ Agrega una venta con el total dado y devuelve el ID y el TIMESTAMP de dicha venta.
 agregarVenta :: Connection -> Double -> IO (Int32, Text)
 agregarVenta conn total = do
   let total_sql = toSql total
@@ -207,7 +206,7 @@ agregarVenta conn total = do
       timestamp_ = (fromSql timestamp_sql) :: Text
   return (id_, timestamp_)
 
--- ~ Asume que existe una entrada con el id pasado
+-- ~ Asume que existe una entrada con el ID pasado.
 eliminarVenta :: Connection -> Int32 -> IO ()
 eliminarVenta conn id = do
   let id_sql = toSql id

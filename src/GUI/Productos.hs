@@ -9,16 +9,16 @@ import Estructuras
 import Biblioteca
 import qualified GI.Gtk as Gtk
 import Data.GI.Base
-import Data.GI.Base.GType
 import Database.HDBC (fromSql, safeFromSql, quickQuery')
 import Database.HDBC.Sqlite3 (Connection)
 import Data.Convertible.Base (ConvertError)
-import Data.Maybe (fromJust, isNothing, isJust, maybe)
+import Data.Maybe (fromJust)
 import Data.Int (Int32)
 import Data.Text (Text, pack, unpack, isInfixOf)
 import Text.Read (readMaybe)
 import Control.Monad (when, void)
 
+-- ~ Llena la store con los productos que hay en la base de datos.
 rellenarProductos :: Gtk.ListStore -> Connection -> IO ()
 rellenarProductos store conn =
   let
@@ -64,6 +64,8 @@ mostrarPrecio treeViewColumn cellRenderer treeModel treeIter = do
   Just cellRendererText <- castTo Gtk.CellRendererText cellRenderer
   set cellRendererText [ #text := (pack (show precio_)) ]
 
+-- ~ Callback de cuando se edita algún campo en la lista de productos desde la GUI.
+-- ~ Hace pattern-matching sobre los distintos campos.
 productoEditado :: Gtk.ListStore -> Connection -> Text -> Text -> Text -> IO ()
 productoEditado model conn "nombre" path_s nombre = do
   path <- Gtk.treePathNewFromString path_s
@@ -122,8 +124,9 @@ productoEditado model conn "precio" path_s precio_s =
         success <- actualizarPrecio conn prod precio
         when success $ toGValue precio >>= #setValue model iter 3))
 
-buscarProducto :: Gtk.SearchEntry -> Gtk.ListStore -> IO ()
-buscarProducto buscar_producto productos_store = do
+-- ~ Callback para cuando se edita el campo de búsqueda de productos.
+buscarProductoCallback :: Gtk.SearchEntry -> Gtk.ListStore -> IO ()
+buscarProductoCallback buscar_producto productos_store = do
   busqueda <- get buscar_producto #text
   Gtk.treeModelForeach productos_store (actualizarVisibilidad busqueda)
   where actualizarVisibilidad busqueda model path iter = do
@@ -143,8 +146,9 @@ buscarProducto buscar_producto productos_store = do
             Gtk.listStoreSet model_list iter [5] [visibilidad]
           return False
 
-eliminarProductoCallBack :: Connection -> Gtk.TreeView -> Gtk.ListStore -> IO ()
-eliminarProductoCallBack conn productos_view productos_store = do
+-- ~ Callback para cuando se presiona el botón de eliminar producto.
+eliminarProductoCallback :: Connection -> Gtk.TreeView -> Gtk.ListStore -> IO ()
+eliminarProductoCallback conn productos_view productos_store = do
   selection <- Gtk.treeViewGetSelection productos_view
   (hay_seleccion, model, iter) <- Gtk.treeSelectionGetSelected selection
   if hay_seleccion
@@ -157,10 +161,10 @@ eliminarProductoCallBack conn productos_view productos_store = do
     when (success && success2) $ void (Gtk.listStoreRemove productos_store iter2)
   else return ()
 
-setUpVentanaAgregarProducto :: Gtk.Builder -> Connection -> Gtk.ListStore -> Gtk.Window -> IO ()
-setUpVentanaAgregarProducto builder conn store ventana = do
+inicializarVentanaAgregarProducto :: Gtk.Builder -> Connection -> Gtk.ListStore -> Gtk.Window -> IO ()
+inicializarVentanaAgregarProducto builder conn store ventana = do
   on ventana #deleteEvent (\_ -> Gtk.widgetHide ventana >>= (\_ -> return True))
-  
+
   Just cancelar <- Gtk.builderGetObject builder "cancelar_agregar_producto" >>= castTo Gtk.Button . fromJust
   Just agregar <- Gtk.builderGetObject builder "aceptar_agregar_producto" >>= castTo Gtk.Button . fromJust
 
@@ -170,6 +174,7 @@ setUpVentanaAgregarProducto builder conn store ventana = do
 
   return ()
 
+-- ~ Función auxiliar, llamada cuando se confirma agregar un producto.
 agregarAux :: Gtk.Builder -> Connection -> Gtk.ListStore -> Gtk.Window -> IO ()
 agregarAux builder conn store ventana = do
   Just nombre_e <- Gtk.builderGetObject builder "entry_nombre_agregar_producto" >>= castTo Gtk.Entry . fromJust

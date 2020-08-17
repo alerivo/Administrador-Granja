@@ -7,23 +7,16 @@ module GUI.GUI where
 import GUI.Productos as Productos
 import GUI.Vender as Vender
 import GUI.Ventas as Ventas
--- ~ import Estructuras
--- ~ import Biblioteca
 import qualified GI.Gtk as Gtk
 import Data.GI.Base
 import Data.GI.Base.GType
--- ~ import Database.HDBC (fromSql, safeFromSql, quickQuery')
--- ~ import Database.HDBC.Sqlite3 (Connection)
--- ~ import Data.Convertible.Base (ConvertError)
 import Data.Maybe (fromJust)
--- ~ import Data.Int (Int32)
 import Data.Text as T (append, pack)
--- ~ import Text.Read (readMaybe)
--- ~ import Control.Monad (when)
 
 gladeFile = "assets/gui.glade"
 logoFile = Just "assets/logo.png"
 
+-- ~ Función principal que incializa la GUI.
 gui conn = do
   Gtk.init Nothing
 
@@ -54,7 +47,7 @@ gui conn = do
   Gtk.treeModelFilterSetVisibleColumn productos_store_filter 5
   productos_store_filter_sort_o <- new Gtk.TreeModelSort [ #model := productos_store_filter ]
   
-  on buscar_producto #searchChanged $ buscarProducto buscar_producto productos_store
+  on buscar_producto #searchChanged $ buscarProductoCallback buscar_producto productos_store
 
     -- Columnas
   set productos_view [ #model := productos_store_filter_sort_o, #enableSearch := False  ]
@@ -105,11 +98,11 @@ gui conn = do
   Gtk.treeViewAppendColumn productos_view columna_precio
 
     -- Borrar producto
-  on eliminar_producto #clicked (eliminarProductoCallBack conn productos_view productos_store)
+  on eliminar_producto #clicked (eliminarProductoCallback conn productos_view productos_store)
 
     -- Agregar producto
   on agregar_producto #clicked (#showAll ventana_agregar_producto)
-  setUpVentanaAgregarProducto builder conn productos_store ventana_agregar_producto
+  inicializarVentanaAgregarProducto builder conn productos_store ventana_agregar_producto
 
 -- Stack Vender
   por_vender_store <- Gtk.listStoreNew [gtypeString, gtypeInt, gtypeDouble, gtypeInt]
@@ -165,7 +158,7 @@ gui conn = do
   -- se dejaba de propagar las teclas enter, de esta manera funciona.
   on ventana_principal #keyPressEvent (\eventKey -> do stack_visible <- Gtk.stackGetVisibleChildName stack_principal
                                                        if maybe False (== "vender") stack_visible
-                                                       then stackVenderCallBack builder conn por_vender_store productos_store ventas_store_DECLARACION_TEMPRANA eventKey
+                                                       then stackVenderCallback builder conn por_vender_store productos_store ventas_store_DECLARACION_TEMPRANA eventKey
                                                        else return False)
 
 -- Stack Ventas
@@ -198,7 +191,7 @@ gui conn = do
   Gtk.treeViewColumnSetCellDataFunc columna_total_ventas renderer_total_ventas (Just Ventas.mostrarTotal)
   Gtk.treeViewAppendColumn ventas_view columna_total_ventas
 
-  on eliminar_venta #clicked (eliminarVentaCallBack conn ventas_store ventas_view total_ventas)
+  on eliminar_venta #clicked (eliminarVentaCallback conn ventas_store ventas_view total_ventas)
 
 -- Ventana principal
   on ventana_principal #destroy Gtk.mainQuit

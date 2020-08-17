@@ -10,11 +10,8 @@ import Estructuras
 import Biblioteca
 import qualified GI.Gtk as Gtk
 import Data.GI.Base
--- ~ import Data.GI.Base.GType
--- ~ import Database.HDBC (fromSql, safeFromSql, quickQuery')
 import Database.HDBC.Sqlite3 (Connection)
-import Data.Convertible.Base (ConvertError)
-import Data.Maybe (fromJust, isJust, isNothing, maybe)
+import Data.Maybe (fromJust, isJust, isNothing)
 import Data.Int (Int32)
 import Data.Text as T (Text, unpack, pack, init, null, append)
 import Text.Read (readMaybe)
@@ -33,7 +30,8 @@ mostrarTotal treeViewColumn cellRenderer treeModel treeIter = do
   Just cellRendererText <- castTo Gtk.CellRendererText cellRenderer
   set cellRendererText [ #text := pack $ show $ precio_ * (fromIntegral unidades_) ]
 
-stackVenderCallBack builder conn store_por_vender store_productos store_ventas eventKey = do
+-- ~ Callback para las pulsaciones de teclas en el Stack Vender.
+stackVenderCallback builder conn store_por_vender store_productos store_ventas eventKey = do
   Just ingresando_cantidad <- Gtk.builderGetObject builder "ingresando_cantidad" >>= castTo Gtk.Label . fromJust
   Just cantidad <- Gtk.builderGetObject builder "cantidad" >>= castTo Gtk.Label . fromJust
   Just accion <- Gtk.builderGetObject builder "accion" >>= castTo Gtk.Label . fromJust

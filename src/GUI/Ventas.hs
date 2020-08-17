@@ -4,21 +4,18 @@
 
 module GUI.Ventas where
 
--- ~ import GUI.Misc
--- ~ import Estructuras
 import Biblioteca
 import GI.Gtk as Gtk
-import Data.GI.Base
--- ~ import Data.GI.Base.GType
 import Database.HDBC (fromSql, quickQuery')
 import Database.HDBC.Sqlite3 (Connection)
--- ~ import Data.Convertible.Base (ConvertError)
 import Data.Maybe (fromJust)
 import Data.Int (Int32)
 import Data.Text as T (Text, pack, unpack, append)
 import Text.Read (readMaybe)
 import Control.Monad (when, void)
 
+-- ~ Llena la store con las ventas que hay en la base de datos y devuelve
+-- ~ el total que suman todas las ventas.
 rellenarVentas :: Gtk.ListStore -> Connection -> IO Double
 rellenarVentas store conn =
   let
@@ -51,8 +48,8 @@ mostrarTotal treeViewColumn cellRenderer treeModel treeIter = do
   Just cellRendererText <- castTo Gtk.CellRendererText cellRenderer
   set cellRendererText [ #text := pack $ show total_ ]
 
-eliminarVentaCallBack :: Connection -> Gtk.ListStore -> Gtk.TreeView -> Gtk.Label -> IO ()
-eliminarVentaCallBack conn store view total_ventas = do
+eliminarVentaCallback :: Connection -> Gtk.ListStore -> Gtk.TreeView -> Gtk.Label -> IO ()
+eliminarVentaCallback conn store view total_ventas = do
   selection <- Gtk.treeViewGetSelection view
   (hay_seleccion, model, iter) <- Gtk.treeSelectionGetSelected selection
   if hay_seleccion

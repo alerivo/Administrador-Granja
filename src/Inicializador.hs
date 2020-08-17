@@ -3,6 +3,7 @@ module Inicializador where
 import Database.HDBC (run, commit)
 import Database.HDBC.Sqlite3 (Connection)
 
+-- ~ Crea las tablas en caso de que no esten creadas.
 iniciar :: Connection -> IO ()
 iniciar conn = do run conn "CREATE TABLE IF NOT EXISTS productos(\
                     \codigo INTEGER PRIMARY KEY,\
