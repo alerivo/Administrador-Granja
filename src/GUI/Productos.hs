@@ -6,7 +6,7 @@ module GUI.Productos where
 
 import GUI.Misc
 import Estructuras
-import Biblioteca
+import BibliotecaBD
 import qualified GI.Gtk as Gtk
 import Data.GI.Base
 import Database.HDBC (fromSql, safeFromSql, quickQuery')

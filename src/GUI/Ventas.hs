@@ -4,7 +4,7 @@
 
 module GUI.Ventas where
 
-import Biblioteca
+import BibliotecaBD
 import GI.Gtk as Gtk
 import Database.HDBC (fromSql, quickQuery')
 import Database.HDBC.Sqlite3 (Connection)

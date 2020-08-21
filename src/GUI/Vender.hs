@@ -7,7 +7,7 @@ module GUI.Vender where
 import GUI.Productos as Productos
 import GUI.Misc
 import Estructuras
-import Biblioteca
+import BibliotecaBD
 import qualified GI.Gtk as Gtk
 import Data.GI.Base
 import Database.HDBC.Sqlite3 (Connection)
@@ -87,7 +87,7 @@ stackVenderCallback builder conn store_por_vender store_productos store_ventas e
       else do
         let codigo_ = (read $ unpack ingresando_cantidad_s) :: Int32
             cantidad_int = (read $ unpack cantidad_s) :: Int32
-        prod_m <- Biblioteca.buscarProducto codigo_ conn
+        prod_m <- BibliotecaBD.buscarProducto codigo_ conn
         if isJust prod_m
         then do
           let prod = fromJust prod_m
@@ -210,7 +210,7 @@ verificarStocks conn store = do
   where
   verificarStocksAux store iter = do
     codigo_ <- Gtk.treeModelGetValue store iter 1 >>= fromGValue :: IO Int32
-    prod_m <- Biblioteca.buscarProducto codigo_ conn
+    prod_m <- BibliotecaBD.buscarProducto codigo_ conn
     cant_por_vender <- Gtk.treeModelGetValue store iter 3 >>= fromGValue :: IO Int32
     if isJust prod_m
     then
@@ -235,7 +235,7 @@ actualizarStocks conn store_por_vender store_productos = do
   actualizarStocksAux conn store_por_vender store_productos iter = do
     codigo_ <- Gtk.treeModelGetValue store_por_vender iter 1 >>= fromGValue :: IO Int32
     cant_por_vender <- Gtk.treeModelGetValue store_por_vender iter 3 >>= fromGValue :: IO Int32
-    prod_m <- Biblioteca.buscarProducto codigo_ conn
+    prod_m <- BibliotecaBD.buscarProducto codigo_ conn
     when (isJust prod_m && (isJust $ stock $ fromJust prod_m)) (do
       let stock_actual = fromJust $ stock $ fromJust $ prod_m
           stock_nuevo = stock_actual - cant_por_vender

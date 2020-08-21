@@ -4,11 +4,11 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0b02f20f21ee39a34ef39819ec777ea165635350691969682f628b511611060d
+-- hash: 40154cc6d24f335aa7b5b03595f25543218d58a2dd40e5271f03a518fa4cfe40
 
 name:           Administrador-Granja
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/Administrador-Granja#readme>
+description:    Please see the README on GitHub at <https://github.com/murdoxix/Administrador-Granja#readme>
 homepage:       https://github.com/murdoxix/Administrador-Granja#readme
 bug-reports:    https://github.com/murdoxix/Administrador-Granja/issues
 author:         Alejandro Rivosecchi
@@ -27,7 +27,7 @@ source-repository head
 
 library
   exposed-modules:
-      Biblioteca
+      BibliotecaBD
       Estructuras
       GUI.GUI
       GUI.Misc

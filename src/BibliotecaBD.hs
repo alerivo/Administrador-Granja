@@ -1,4 +1,4 @@
-module Biblioteca where
+module BibliotecaBD where
 
 import Estructuras
 import Database.HDBC (run, commit, safeFromSql, fromSql, toSql, quickQuery', SqlValue ( SqlNull ), disconnect)

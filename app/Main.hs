@@ -1,6 +1,6 @@
 module Main where
 
-import Biblioteca
+import BibliotecaBD
 import Inicializador
 import GUI.GUI
 

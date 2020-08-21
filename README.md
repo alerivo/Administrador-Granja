@@ -17,7 +17,7 @@ Comando para compilar y ejecutar:
 
 En los siguientes enlaces hay documentación sobre los paquetes mas usados:
 * ![HDBC](https://hackage.haskell.org/package/HDBC-2.4.0.3/docs/Database-HDBC.html)
-* ![GTK+ 3](https://developer.gnome.org/gtk3/stable/)
+* ![GTK3](https://developer.gnome.org/gtk3/stable/)
 * ![gi-gtk](https://hackage.haskell.org/package/gi-gtk-3.0.33)
 
 ## Base de datos
@@ -32,7 +32,8 @@ Y la siguiente imagen muestra el pasaje a tablas:
 ![tablas](/assets/tablas.png)
 
 ## Posibles mejoras:
-* Evitar la edición de un producto que esta por venderse.
 * Asignar teclas para seleccionar cada Stack (por ejemplo F1, F2 y F3)
 * Mejorar el historial de ventas: que quede registrado que productos se vendieron.
-* Mejorar visualización de las ventas: por ejemplo poder ver las ventas por día/mes/año.
+* Mejorar la visualización de las ventas: por ejemplo poder ver las ventas por día/mes/año.
+* Stock con cantidades reales en vez de enteras.
+* Cuando se concreta una venta, para actualizar el stock de los productos en la store de productos la misma se recorre una a una por cada producto. Podría ser un proceso lento si hay muchos productos. Evitar esto sería una mejora.
